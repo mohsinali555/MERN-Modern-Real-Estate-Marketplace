@@ -3,7 +3,11 @@ import { signin, signup } from "../controllers/auth.controller.js";
 
 const router = express.Router();
 
+// signup route
 router.post("/signup", signup);
+
+// signin route
+
 router.post("/signin", signin);
 
 export default router;
