@@ -42,7 +42,10 @@ export const google = async (req, res, next) => {
       res
         .cookie("access_token", token, { httpOnly: true })
         .status(200)
-        .json(rest);
+        .json({
+          ...rest,
+          avatar: user.avatar,
+        });
     } else {
       const generatedPassword =
         Math.random().toString(36).slice(-8) +
@@ -62,7 +65,10 @@ export const google = async (req, res, next) => {
       res
         .cookie("access_token", token, { httpOnly: true })
         .status(200)
-        .json(rest);
+        .json({
+          ...rest,
+          avatar: user.avatar,
+        });
     }
   } catch (error) {
     next(error);
