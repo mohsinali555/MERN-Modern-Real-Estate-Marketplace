@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import {
   getDownloadURL,
   getStorage,
@@ -15,13 +15,10 @@ import {
   deleteUserStart,
   deleteUserSuccess,
   signOutUserStart,
-  signOutUserSuccess,
-  signOutUserFailure,
 } from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
-
-const Profile = () => {
+export default function Profile() {
   const fileRef = useRef(null);
   const { currentUser, loading, error } = useSelector((state) => state.user);
   const [file, setFile] = useState(undefined);
@@ -29,6 +26,8 @@ const Profile = () => {
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
   const [updateSuccess, setUpdateSuccess] = useState(false);
+  const [showListingsError, setShowListingsError] = useState(false);
+  const [userListings, setUserListings] = useState([]);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -53,10 +52,27 @@ const Profile = () => {
       (error) => {
         setFileUploadError(true);
       },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) =>
-          setFormData({ ...formData, avatar: downloadURL })
-        );
+      async () => {
+        try {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          setFormData((prev) => ({ ...prev, avatar: downloadURL }));
+          const res = await fetch(`/api/user/update/${currentUser._id}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({ avatar: downloadURL }),
+          });
+          const data = await res.json();
+          if (data.success === false) {
+            console.error("Failed to update avatar:", data.message);
+            return;
+          }
+          dispatch(updateUserSuccess(data));
+        } catch (err) {
+          console.error("Avatar upload error:", err);
+        }
       }
     );
   };
@@ -112,12 +128,12 @@ const Profile = () => {
       const res = await fetch("/api/auth/signout");
       const data = await res.json();
       if (data.success === false) {
-        dispatch(signOutUserFailure(data.message));
+        dispatch(deleteUserFailure(data.message));
         return;
       }
-      dispatch(signOutUserSuccess(data));
+      dispatch(deleteUserSuccess(data));
     } catch (error) {
-      dispatch(signOutUserFailure(data.message));
+      dispatch(deleteUserFailure(data.message));
     }
   };
 
@@ -140,11 +156,13 @@ const Profile = () => {
         />
         <p className="text-sm self-center">
           {fileUploadError ? (
-            <span className="text-red-700">Error Image Upload</span>
+            <span className="text-red-700">
+              Error Image upload (image must be less than 2 mb)
+            </span>
           ) : filePerc > 0 && filePerc < 100 ? (
             <span className="text-slate-700">{`Uploading ${filePerc}%`}</span>
           ) : filePerc === 100 ? (
-            <span className="text-green-700">Image Successfully Uploaded</span>
+            <span className="text-green-700">Image successfully uploaded!</span>
           ) : (
             ""
           )}
@@ -154,23 +172,23 @@ const Profile = () => {
           placeholder="username"
           defaultValue={currentUser.username}
           id="username"
-          className=" p-3 rounded-lg bg-white border border-gray-300"
+          className="border p-3 rounded-lg"
           onChange={handleChange}
         />
         <input
           type="email"
           placeholder="email"
-          defaultValue={currentUser.email}
           id="email"
-          className=" p-3 rounded-lg bg-white border border-gray-300"
+          defaultValue={currentUser.email}
+          className="border p-3 rounded-lg"
           onChange={handleChange}
         />
         <input
           type="password"
           placeholder="password"
-          id="password"
-          className=" p-3 rounded-lg bg-white border border-gray-300"
           onChange={handleChange}
+          id="password"
+          className="border p-3 rounded-lg"
         />
         <button
           disabled={loading}
@@ -196,12 +214,11 @@ const Profile = () => {
           Sign out
         </span>
       </div>
+
       <p className="text-red-700 mt-5">{error ? error : ""}</p>
       <p className="text-green-700 mt-5">
-        {updateSuccess ? "User is updated Successfully" : ""}
+        {updateSuccess ? "User is updated successfully!" : ""}
       </p>
     </div>
   );
-};
-
-export default Profile;
+}

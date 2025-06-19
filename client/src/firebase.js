@@ -6,11 +6,11 @@ import { initializeApp } from "firebase/app";
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: "mern-modern-estate-959b2.firebaseapp.com",
-  projectId: "mern-modern-estate-959b2",
-  storageBucket: "mern-modern-estate-959b2.firebasestorage.app",
-  messagingSenderId: "354902962468",
-  appId: "1:354902962468:web:540a0e15f1f1aeed3cc3b1",
+  authDomain: "dermlocksol.firebaseapp.com",
+  projectId: "dermlocksol",
+  storageBucket: "dermlocksol.appspot.com",
+  messagingSenderId: "1049324715708",
+  appId: "1:1049324715708:web:0c56b0386ab9bf074d5ab9",
 };
 
 // Initialize Firebase
