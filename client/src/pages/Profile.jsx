@@ -289,12 +289,14 @@ export default function Profile() {
                 >
                   Delete
                 </button>
-                <button
-                  onClick={() => handleListingEdit(listing._id)}
-                  className="text-green-700 uppercase"
-                >
-                  Edit
-                </button>
+                <Link to={`/update-listing/${listing._id}`}>
+                  <button
+                    //  onClick={() => handleListingEdit(listing._id)}
+                    className="text-green-700 uppercase"
+                  >
+                    Edit
+                  </button>
+                </Link>
               </div>
             </div>
           ))}
