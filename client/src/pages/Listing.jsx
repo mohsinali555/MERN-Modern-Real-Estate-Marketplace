@@ -55,6 +55,7 @@ const Listing = () => {
       )}
       {listing && !loading && !error && (
         <div>
+          {/* swiper for slider in Listing Page */}
           <Swiper navigation>
             {listing.imageUrls.map((url) => (
               <SwiperSlide key={url}>

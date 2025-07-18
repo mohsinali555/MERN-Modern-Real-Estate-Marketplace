@@ -6,6 +6,7 @@ const initialState = {
   loading: false,
 };
 
+// create userSlice to manage user state globally
 const userSlice = createSlice({
   name: "user",
   initialState,
